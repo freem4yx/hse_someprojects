@@ -113,13 +113,13 @@ void writeToAll(int sender, const char* buffer, size_t size, History* history) {
 }
 
 int main() {
-    int server = Socket(AF_INET, SOCK_STREAM, 0);
+    int server = socket_wrapped(AF_INET, SOCK_STREAM, 0);
     sockaddr_in addr = {0, 0, 0, 0};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(32000);
     unsigned int addrlen = sizeof(addr);
-    Bind(server, (sockaddr *) (&addr), addrlen);
-    Listen(server, 5);
+    bind_wrapped(server, (sockaddr *) (&addr), addrlen);
+    listen_wrapped(server, 5);
 
     char buffer[BUFFERSIZE];
     History* history = new History;
@@ -141,10 +141,10 @@ int main() {
             FD_SET(elem, &inputs);
             if (maxSocket < elem) maxSocket = elem;
         }
-        Select(maxSocket + 1, &inputs, NULL, NULL, NULL);
+        select_wrapped(maxSocket + 1, &inputs, NULL, NULL, NULL);
 
         if (FD_ISSET(server, &inputs)) {
-            int newSocket = Accept(server, (sockaddr *) (&addr), &addrlen);
+            int newSocket = accept_wrapped(server, (sockaddr *) (&addr), &addrlen);
             connected.push_back(newSocket);
             std::cout << "New client connected: " << newSocket << '\n';
         }
@@ -216,7 +216,7 @@ int main() {
                     } else {
                         perror("Read Server");
                     }
-                    Close(elem);
+                    close_wrapped(elem);
                     connected.erase(std::remove(connected.begin(), connected.end(), elem), connected.end());
                 }
             }

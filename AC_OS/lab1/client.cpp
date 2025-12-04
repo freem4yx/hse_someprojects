@@ -6,12 +6,12 @@
 #include <unistd.h>
 
 int main() {
-    int fd = Socket(AF_INET, SOCK_STREAM, 0);
+    int fd = socket_wrapped(AF_INET, SOCK_STREAM, 0);
     sockaddr_in addr = {0, 0, 0, 0};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(32000);
-    Inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
-    Connect(fd, (sockaddr*) &addr, sizeof(addr));
+    inet_pton_wrapped(AF_INET, "127.0.0.1", &addr.sin_addr);
+    connect_wrapped(fd, (sockaddr*) &addr, sizeof(addr));
     std::cout << "Enter your name:\n";
     std::string name;
     std::getline(std::cin, name);
@@ -32,7 +32,7 @@ int main() {
         FD_SET(STDIN_FILENO, &inputs);
         FD_SET(fd, &inputs);
 
-        Select(maxSocket + 1, &inputs, NULL, NULL, NULL);
+        select_wrapped(maxSocket + 1, &inputs, NULL, NULL, NULL);
 
         if (FD_ISSET(STDIN_FILENO, &inputs)) {
             if (!std::getline(std::cin, message)) break;
@@ -52,7 +52,7 @@ int main() {
         }
 
         if (FD_ISSET(fd, &inputs)) {
-            bytesReaded = ReadClient(fd, buffer, BUFFERSIZE - 1);
+            bytesReaded = readClient_wrapped(fd, buffer, BUFFERSIZE - 1);
 
             write(STDOUT_FILENO, buffer, bytesReaded);
         }

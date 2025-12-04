@@ -11,20 +11,20 @@
 #define BUFFERSIZE 256
 #define HISTORYSIZE 10
 
-int Socket(int domain, int type, int protocol);
+int socket_wrapped(int domain, int type, int protocol);
 
-void Bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+void bind_wrapped(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
-void Listen(int sockfd, int backlog);
+void listen_wrapped(int sockfd, int backlog);
 
-int Accept(int sockfd, sockaddr *addr, socklen_t *addrlen);
+int accept_wrapped(int sockfd, sockaddr *addr, socklen_t *addrlen);
 
-void Connect(int sockfd, const sockaddr *addr, socklen_t addrlen);
+void connect_wrapped(int sockfd, const sockaddr *addr, socklen_t addrlen);
 
-void Inet_pton(int af, const char *src, void* dst);
+void inet_pton_wrapped(int af, const char *src, void* dst);
 
-void Select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout);
+void select_wrapped(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds, timeval* timeout);
 
-long ReadClient(int fd, void* buf, size_t count);
+long readClient_wrapped(int fd, void* buf, size_t count);
 
-void Close(int fd);
+void close_wrapped(int fd);
