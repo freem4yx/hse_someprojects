@@ -225,9 +225,9 @@ int main() {
 
     // Закрываем все соединения
     for (int client : connected) {
-        close(client);
+        if (client != server) close_wrapped(client);
     }
-    close(server);
+    close_wrapped(server);
 
     delete history;
     return 0;
