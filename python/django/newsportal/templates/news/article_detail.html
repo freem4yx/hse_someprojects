@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card mb-4">
+    {% if article.image %}
+    <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}">
+    {% endif %}
+    <div class="card-body">
+        <h1 class="card-title">{{ article.title }}</h1>
+        <p class="text-muted">
+            Автор: {{ article.author.username }} |
+            {{ article.created_at|date:"d.m.Y H:i" }} |
+            Категория: {{ article.category.name|default:"Без категории" }} |
+            Просмотров: {{ article.views }}
+        </p>
+
+        {% if article.tags.all %}
+        <div class="mb-3">
+            {% for tag in article.tags.all %}
+            <span class="badge bg-secondary">{{ tag.name }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card-text">
+            {{ article.content|linebreaks }}
+        </div>
+
+        <!-- Кнопки для автора -->
+        {% if user == article.author %}
+        <div class="mt-4">
+            <a href="{% url 'article-update' article.slug %}" class="btn btn-warning">Редактировать</a>
+            <a href="{% url 'article-delete' article.slug %}" class="btn btn-danger">Удалить</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Комментарии -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Комментарии ({{ comments.count }})</h5>
+    </div>
+    <div class="card-body">
+        {% if user.is_authenticated %}
+        <!-- Форма добавления комментария -->
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ comment_form.content }}
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+        </form>
+        {% else %}
+        <p><a href="{% url 'login' %}">Войдите</a>, чтобы оставить комментарий.</p>
+        {% endif %}
+
+        <!-- Список комментариев -->
+        {% for comment in comments %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <strong>{{ comment.author.username }}</strong>
+                    <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+                </div>
+                <p class="mt-2 mb-0">{{ comment.content|linebreaks }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">Пока нет комментариев. Будьте первым!</p>
+        {% endfor %}
+    </div>
+</div>
+
+<a href="{% url 'article-list' %}" class="btn btn-secondary">← Назад к списку</a>
+{% endblock %}
