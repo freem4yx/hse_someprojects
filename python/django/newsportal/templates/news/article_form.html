@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">
+        {% if object %}
+            <i class="bi bi-pencil-square"></i> Редактировать статью
+        {% else %}
+            <i class="bi bi-plus-circle"></i> Создать новую статью
+        {% endif %}
+    </h2>
+
+    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Заголовок -->
+        <div class="mb-3">
+            <label for="id_title" class="form-label">
+                <i class="bi bi-card-heading"></i> Заголовок *
+            </label>
+            <input type="text" name="title" class="form-control" id="id_title"
+                   value="{{ form.title.value|default_if_none:'' }}" required>
+            <div class="invalid-feedback">Пожалуйста, введите заголовок статьи.</div>
+        </div>
+
+        <!-- Краткое описание -->
+        <div class="mb-3">
+            <label for="id_summary" class="form-label">
+                <i class="bi bi-text-paragraph"></i> Краткое описание
+            </label>
+            <textarea name="summary" class="form-control" id="id_summary" rows="3">{{ form.summary.value|default_if_none:'' }}</textarea>
+            <div class="form-text">Будет отображаться в списке статей.</div>
+        </div>
+
+        <!-- Полный текст -->
+        <div class="mb-3">
+            <label for="id_content" class="form-label">
+                <i class="bi bi-file-text"></i> Полный текст *
+            </label>
+            <textarea name="content" class="form-control" id="id_content" rows="10" required>{{ form.content.value|default_if_none:'' }}</textarea>
+            <div class="invalid-feedback">Пожалуйста, введите текст статьи.</div>
+        </div>
+
+        <div class="row">
+            <!-- Категория -->
+            <div class="col-md-6 mb-3">
+                <label for="id_category" class="form-label">
+                    <i class="bi bi-tag"></i> Категория
+                </label>
+                <select name="category" class="form-select" id="id_category">
+                    <option value="">--- Выберите категорию ---</option>
+                    {% for category in form.category.field.queryset %}
+                        <option value="{{ category.id }}"
+                                {% if form.category.value|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Статус -->
+            <div class="col-md-6 mb-3">
+                <label for="id_status" class="form-label">
+                    <i class="bi bi-eye"></i> Статус
+                </label>
+                <select name="status" class="form-select" id="id_status">
+                    {% for value, label in form.status.field.choices %}
+                        <option value="{{ value }}"
+                                {% if form.status.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Теги -->
+        <div class="mb-3">
+            <label for="id_tags" class="form-label">
+                <i class="bi bi-tags"></i> Теги
+            </label>
+            <select name="tags" class="form-select" id="id_tags" multiple size="4">
+                {% for tag in form.tags.field.queryset %}
+                    <option value="{{ tag.id }}"
+                            {% if tag.id in form.tags.value or tag.id|stringformat:"s" in form.tags.value %}selected{% endif %}>
+                        {{ tag.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <div class="form-text">Для выбора нескольких тегов удерживайте Ctrl (Cmd на Mac).</div>
+        </div>
+
+        <!-- Изображение -->
+        <div class="mb-3">
+        <label for="id_image" class="form-label">
+                <i class="bi bi-image"></i> Изображение
+            </label>
+            <input type="file" name="image" class="form-control" id="id_image" accept="image/*">
+            {% if object and object.image %}
+            <div class="mt-2">
+                <p>Текущее изображение:</p>
+                <img src="{{ object.image.url }}" alt="{{ object.title }}" class="img-thumbnail" style="max-height: 150px;">
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" name="image-clear" id="image-clear_id">
+                    <label class="form-check-label" for="image-clear_id">
+                        Удалить текущее изображение
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Кнопки -->
+        <div class="d-flex justify-content-between mt-4">
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    {% if object %}
+                        <i class="bi bi-check-circle"></i> Сохранить изменения
+                    {% else %}
+                        <i class="bi bi-check-circle"></i> Опубликовать статью
+                    {% endif %}
+                </button>
+                <a href="{% if object %}{% url 'article-detail' object.slug %}{% else %}{% url 'article-list' %}{% endif %}"
+                   class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Отмена
+                </a>
+            </div>
+
+            {% if object %}
+            <a href="{% url 'article-delete' object.slug %}" class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i> Удалить статью
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Валидация формы -->
+<script>
+    // Пример простой валидации на стороне клиента
+    (function() {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}
