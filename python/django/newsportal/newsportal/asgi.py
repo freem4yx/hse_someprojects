@@ -1,5 +1,5 @@
 """
-ASGI config for newsport project.
+ASGI config for newsportal project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'newsport.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'newsportal.settings')
 
 application = get_asgi_application()
